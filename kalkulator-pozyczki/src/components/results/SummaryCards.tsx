@@ -6,8 +6,6 @@ import { Wallet, TrendingUp, ArrowDownCircle, Calendar } from 'lucide-react';
 export function SummaryCards() {
   const { summary } = useCalculation();
 
-  const totalWithdrawn = summary.totalInterestPaid + summary.totalCapitalRepaid;
-
   const cards = [
     {
       title: 'Pozostały kapitał',
@@ -16,10 +14,10 @@ export function SummaryCards() {
       description: `Wpłacono: ${formatPLN(summary.totalDeposited)}`,
     },
     {
-      title: 'Odsetki należne',
-      value: `${formatPLN(summary.totalAccruedInterest)}${summary.totalAccruedInterest < 0 ? ' (nadpłata)' : ''}`,
+      title: 'Odsetki do spłaty',
+      value: formatPLN(summary.totalAccruedInterest),
       icon: TrendingUp,
-      description: `Wypłacono: ${formatPLN(totalWithdrawn)}`,
+      description: `Wypłacono odsetek: ${formatPLN(summary.totalInterestPaid)}`,
     },
     {
       title: 'Łączne zobowiązanie',

@@ -53,10 +53,9 @@ export function InterestBreakdown() {
             </dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-muted-foreground">Odsetki należne</dt>
-            <dd className={`font-medium ${summary.totalAccruedInterest >= 0 ? 'text-amber-600 dark:text-amber-400' : 'text-green-600 dark:text-green-400'}`}>
+            <dt className="text-muted-foreground">Odsetki do spłaty</dt>
+            <dd className="font-medium text-amber-600 dark:text-amber-400">
               {formatPLN(summary.totalAccruedInterest)}
-              {summary.totalAccruedInterest < 0 && ' (nadpłata)'}
             </dd>
           </div>
           <hr className="border-border" />
