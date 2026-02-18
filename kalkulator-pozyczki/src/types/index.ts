@@ -1,4 +1,4 @@
-export type TransactionType = 'capital_deposit' | 'capital_repayment' | 'interest_payment' | 'mixed_payment';
+export type TransactionType = 'deposit' | 'interest_payment' | 'capital_repayment';
 
 export type CapitalizationType = 'none' | 'daily' | 'monthly' | 'yearly';
 
@@ -7,8 +7,6 @@ export interface Transaction {
   date: string; // 'YYYY-MM-DD'
   type: TransactionType;
   amount: number; // Always positive
-  interestPortion?: number; // Only for mixed_payment
-  capitalPortion?: number; // Only for mixed_payment
   note?: string;
 }
 
@@ -42,9 +40,9 @@ export interface DayEvent {
 export interface LoanSummary {
   currentPrincipal: number;
   totalAccruedInterest: number;
+  totalDeposited: number;
   totalInterestPaid: number;
   totalCapitalRepaid: number;
-  totalCapitalDeposited: number;
   totalOwed: number;
   daysElapsed: number;
   dailyInterestRate: number;

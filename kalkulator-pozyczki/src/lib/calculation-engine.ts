@@ -22,14 +22,6 @@ function groupTransactionsByDate(transactions: Transaction[]): Map<string, Trans
   return map;
 }
 
-/**
- * Check if capitalization should happen on this date.
- *
- * - daily: every day
- * - monthly: on the 1st of each month (capitalizes interest from the previous month)
- * - yearly: on Jan 1st (capitalizes interest from the previous year)
- * - none: never
- */
 function shouldCapitalize(
   capitalization: CapitalizationType,
   currentDate: Date,
@@ -66,9 +58,9 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
 
   let principal = config.initialCapital;
   let accruedInterest = 0;
+  let totalDeposited = config.initialCapital;
   let totalInterestPaid = 0;
   let totalCapitalRepaid = 0;
-  let totalCapitalDeposited = config.initialCapital;
   let totalCapitalizedInterest = 0;
 
   const events: DayEvent[] = [];
@@ -84,7 +76,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
     principalAfter: principal,
     accruedInterestAfter: 0,
     totalOwed: principal,
-    transactionType: 'capital_deposit',
+    transactionType: 'deposit',
     transactionAmount: config.initialCapital,
     transactionNote: 'Kapitał początkowy',
   });
@@ -103,8 +95,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
     const principalBefore = principal;
     const accruedInterestBefore = accruedInterest;
 
-    // 1. Capitalize interest if applicable (before accruing today's interest)
-    //    Capitalization moves accrued interest → principal so it compounds.
+    // 1. Capitalize interest if applicable
     if (shouldCapitalize(capitalization, currentDate, prevDate) && accruedInterest > 0) {
       const capitalized = accruedInterest;
       principal += capitalized;
@@ -122,27 +113,18 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
     if (dayTransactions) {
       for (const tx of dayTransactions) {
         switch (tx.type) {
-          case 'capital_deposit':
+          case 'deposit':
             principal += tx.amount;
-            totalCapitalDeposited += tx.amount;
-            break;
-          case 'capital_repayment':
-            principal = Math.max(0, principal - tx.amount);
-            totalCapitalRepaid += tx.amount;
+            totalDeposited += tx.amount;
             break;
           case 'interest_payment':
             accruedInterest = Math.max(0, accruedInterest - tx.amount);
             totalInterestPaid += tx.amount;
             break;
-          case 'mixed_payment': {
-            const interestPart = tx.interestPortion ?? 0;
-            const capitalPart = tx.capitalPortion ?? 0;
-            accruedInterest = Math.max(0, accruedInterest - interestPart);
-            totalInterestPaid += interestPart;
-            principal = Math.max(0, principal - capitalPart);
-            totalCapitalRepaid += capitalPart;
+          case 'capital_repayment':
+            principal = Math.max(0, principal - tx.amount);
+            totalCapitalRepaid += tx.amount;
             break;
-          }
         }
 
         events.push({
@@ -180,9 +162,9 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
   const summary: LoanSummary = {
     currentPrincipal: principal,
     totalAccruedInterest: accruedInterest,
+    totalDeposited,
     totalInterestPaid,
     totalCapitalRepaid,
-    totalCapitalDeposited,
     totalOwed: principal + accruedInterest,
     daysElapsed: totalDays,
     dailyInterestRate: dailyRate,
@@ -196,9 +178,9 @@ function emptySummary(config: LoanConfig): LoanSummary {
   return {
     currentPrincipal: config.initialCapital,
     totalAccruedInterest: 0,
+    totalDeposited: config.initialCapital,
     totalInterestPaid: 0,
     totalCapitalRepaid: 0,
-    totalCapitalDeposited: config.initialCapital,
     totalOwed: config.initialCapital,
     daysElapsed: 0,
     dailyInterestRate: config.annualInterestRate / 100 / 365,

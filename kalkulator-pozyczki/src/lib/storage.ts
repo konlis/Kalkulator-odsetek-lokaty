@@ -22,6 +22,15 @@ export function loadState(): LoanState {
     if (!parsed.config.capitalization) {
       parsed.config.capitalization = 'none';
     }
+    // Migrate old transaction types
+    for (const tx of parsed.transactions) {
+      const oldType = tx.type as string;
+      if (oldType === 'capital_deposit') {
+        tx.type = 'deposit';
+      } else if (oldType === 'mixed_payment' || oldType === 'withdrawal') {
+        tx.type = 'interest_payment';
+      }
+    }
     return parsed;
   } catch {
     return getDefaultState();

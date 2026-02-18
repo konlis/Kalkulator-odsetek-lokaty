@@ -4,7 +4,7 @@ export interface ParsedTransaction {
   date: string;       // YYYY-MM-DD
   amount: number;     // Always positive
   type: TransactionType;
-  title: string;      // e.g. "UMOWA NR 01/04/2024 Odsetki"
+  title: string;      // e.g. "UMOWA NR 01/04/2024"
   note: string;       // Transfer type e.g. "PRZELEW ELIXIR - ONLINE"
 }
 
@@ -40,8 +40,6 @@ export async function extractTextFromPdf(file: File): Promise<string> {
 export function parseSantanderText(text: string): ParsedTransaction[] {
   const transactions: ParsedTransaction[] = [];
 
-  // Split into blocks starting with "Data operacji"
-  // Each transaction block starts with "Data operacji\nYYYY-MM-DD"
   const blockRegex = /Data operacji\n(\d{4}-\d{2}-\d{2})/g;
   const blockStarts: { index: number; date: string }[] = [];
 
@@ -56,9 +54,7 @@ export function parseSantanderText(text: string): ParsedTransaction[] {
     const block = text.slice(start, end);
     const date = blockStarts[i].date;
 
-    // Extract amount: look for pattern like "-5 000,00 PLN" or "50 000,00 PLN" or "100 000,00 PLN"
-    // The amount appears before "PLN" followed by saldo
-    // Pattern: optional minus, digits with optional space separators, comma, two digits, then PLN
+    // Extract amounts from block
     const amountRegex = /(-?[\d ]+,\d{2})\s*PLN/g;
     const amounts: { value: number; sign: number }[] = [];
     let amountMatch;
@@ -70,21 +66,19 @@ export function parseSantanderText(text: string): ParsedTransaction[] {
       }
     }
 
-    // First amount is the transaction amount, second is saldo (ignore)
     if (amounts.length === 0) continue;
     const txAmount = amounts[0];
 
-    // Extract title: "Tytuł: ..."
+    // Extract title
     const titleMatch = block.match(/Tytuł:\s*(.+?)(?:\n|$)/);
     const title = titleMatch ? titleMatch[1].trim() : '';
 
-    // Extract transfer type (first line after date block header)
-    // After "Data księgowania\nYYYY-MM-DD\n" comes the transfer type
+    // Extract transfer type
     const typeMatch = block.match(/Data księgowania\n\d{4}-\d{2}-\d{2}\n(.+?)(?:\n|$)/);
     const transferType = typeMatch ? typeMatch[1].trim() : '';
 
-    // Determine transaction type based on rules
-    const type = classifyTransaction(txAmount.sign, title, transferType);
+    // Simple classification: positive = deposit, negative = interest_payment (editable by user)
+    const type: TransactionType = txAmount.sign > 0 ? 'deposit' : 'interest_payment';
 
     transactions.push({
       date,
@@ -96,30 +90,4 @@ export function parseSantanderText(text: string): ParsedTransaction[] {
   }
 
   return transactions;
-}
-
-function classifyTransaction(
-  sign: number,
-  title: string,
-  transferType: string,
-): TransactionType {
-  // Positive amount (UZNANIE / UZNANIE SORBNET) → capital_deposit
-  if (sign > 0 || /^UZNANIE/i.test(transferType)) {
-    return 'capital_deposit';
-  }
-
-  const titleLower = title.toLowerCase();
-
-  // Negative + "odsetki" in title → interest_payment
-  if (titleLower.includes('odsetki')) {
-    return 'interest_payment';
-  }
-
-  // Negative + "spłata" in title → capital_repayment
-  if (titleLower.includes('spłata') || titleLower.includes('splata')) {
-    return 'capital_repayment';
-  }
-
-  // Negative + no keyword → default to interest_payment
-  return 'interest_payment';
 }

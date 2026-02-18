@@ -6,32 +6,34 @@ import { Wallet, TrendingUp, ArrowDownCircle, Calendar } from 'lucide-react';
 export function SummaryCards() {
   const { summary } = useCalculation();
 
+  const totalWithdrawn = summary.totalInterestPaid + summary.totalCapitalRepaid;
+
   const cards = [
     {
       title: 'Pozostały kapitał',
       value: formatPLN(summary.currentPrincipal),
       icon: Wallet,
-      description: `Wpłacono: ${formatPLN(summary.totalCapitalDeposited)}`,
+      description: `Wpłacono: ${formatPLN(summary.totalDeposited)}`,
     },
     {
       title: 'Odsetki do zapłaty',
       value: formatPLN(summary.totalAccruedInterest),
       icon: TrendingUp,
-      description: `Zapłacono: ${formatPLN(summary.totalInterestPaid)}`,
+      description: `Wypłacono: ${formatPLN(totalWithdrawn)}`,
     },
     {
       title: 'Łączne zobowiązanie',
       value: formatPLN(summary.totalOwed),
       icon: ArrowDownCircle,
-      description: `Spłacono kapitału: ${formatPLN(summary.totalCapitalRepaid)}`,
+      description: summary.totalCapitalizedInterest > 0
+        ? `Skapitalizowano: ${formatPLN(summary.totalCapitalizedInterest)}`
+        : 'Kapitał + odsetki',
     },
     {
       title: 'Czas trwania',
       value: `${summary.daysElapsed} dni`,
       icon: Calendar,
-      description: summary.totalCapitalizedInterest > 0
-        ? `Skapitalizowano: ${formatPLN(summary.totalCapitalizedInterest)}`
-        : `Dziennie: ${formatPLN(summary.currentPrincipal * summary.dailyInterestRate)}`,
+      description: `Dziennie: ${formatPLN(summary.currentPrincipal * summary.dailyInterestRate)}`,
     },
   ];
 

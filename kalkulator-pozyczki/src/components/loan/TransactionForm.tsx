@@ -30,10 +30,8 @@ interface TransactionFormProps {
 
 const emptyForm = {
   date: new Date().toISOString().slice(0, 10),
-  type: 'capital_repayment' as TransactionType,
+  type: 'interest_payment' as TransactionType,
   amount: 0,
-  interestPortion: 0,
-  capitalPortion: 0,
   note: '',
 };
 
@@ -47,8 +45,6 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
         date: editTransaction.date,
         type: editTransaction.type,
         amount: editTransaction.amount,
-        interestPortion: editTransaction.interestPortion ?? 0,
-        capitalPortion: editTransaction.capitalPortion ?? 0,
         note: editTransaction.note ?? '',
       });
     } else {
@@ -57,11 +53,7 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
   }, [editTransaction, open]);
 
   const handleSubmit = () => {
-    const errors = validateTransaction(
-      { ...form, interestPortion: form.interestPortion, capitalPortion: form.capitalPortion },
-      form.type,
-      state.config
-    );
+    const errors = validateTransaction(form, state.config);
     if (errors.length > 0) {
       toast.error(errors[0].message);
       return;
@@ -72,9 +64,6 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
       date: form.date,
       type: form.type,
       amount: form.amount,
-      ...(form.type === 'mixed_payment'
-        ? { interestPortion: form.interestPortion, capitalPortion: form.capitalPortion }
-        : {}),
       ...(form.note ? { note: form.note } : {}),
     };
 
@@ -88,8 +77,6 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
 
     onOpenChange(false);
   };
-
-  const isMixed = form.type === 'mixed_payment';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,45 +131,6 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
               }
             />
           </div>
-
-          {isMixed && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="tx-interest-portion">Część odsetkowa (PLN)</Label>
-                <Input
-                  id="tx-interest-portion"
-                  type="number"
-                  min={0}
-                  step={100}
-                  value={form.interestPortion || ''}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      interestPortion: parseFloat(e.target.value) || 0,
-                      capitalPortion: f.amount - (parseFloat(e.target.value) || 0),
-                    }))
-                  }
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="tx-capital-portion">Część kapitałowa (PLN)</Label>
-                <Input
-                  id="tx-capital-portion"
-                  type="number"
-                  min={0}
-                  step={100}
-                  value={form.capitalPortion || ''}
-                  onChange={(e) =>
-                    setForm((f) => ({
-                      ...f,
-                      capitalPortion: parseFloat(e.target.value) || 0,
-                      interestPortion: f.amount - (parseFloat(e.target.value) || 0),
-                    }))
-                  }
-                />
-              </div>
-            </>
-          )}
 
           <div className="space-y-2">
             <Label htmlFor="tx-note">Notatka (opcjonalnie)</Label>

@@ -47,7 +47,7 @@ export function InterestBreakdown() {
             </div>
           )}
           <div className="flex justify-between">
-            <dt className="text-muted-foreground">Odsetki zapłacone</dt>
+            <dt className="text-muted-foreground">Odsetki wypłacone</dt>
             <dd className="font-medium text-green-600 dark:text-green-400">
               {formatPLN(summary.totalInterestPaid)}
             </dd>
@@ -57,6 +57,15 @@ export function InterestBreakdown() {
             <dd className="font-medium text-amber-600 dark:text-amber-400">
               {formatPLN(summary.totalAccruedInterest)}
             </dd>
+          </div>
+          <hr className="border-border" />
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">Łącznie wpłacono</dt>
+            <dd className="font-medium">{formatPLN(summary.totalDeposited)}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">Kapitał wypłacony</dt>
+            <dd className="font-medium">{formatPLN(summary.totalCapitalRepaid)}</dd>
           </div>
         </dl>
       </CardContent>

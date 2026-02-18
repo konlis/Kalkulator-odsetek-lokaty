@@ -1,4 +1,4 @@
-import type { LoanConfig, Transaction, TransactionType } from '@/types';
+import type { LoanConfig, Transaction } from '@/types';
 
 export interface ValidationError {
   field: string;
@@ -29,7 +29,6 @@ export function validateLoanConfig(config: Partial<LoanConfig>): ValidationError
 
 export function validateTransaction(
   tx: Partial<Transaction>,
-  type: TransactionType,
   config: LoanConfig
 ): ValidationError[] {
   const errors: ValidationError[] = [];
@@ -42,26 +41,6 @@ export function validateTransaction(
 
   if (!tx.amount || tx.amount <= 0) {
     errors.push({ field: 'amount', message: 'Kwota musi być większa od 0' });
-  }
-
-  if (type === 'mixed_payment') {
-    const interestPortion = tx.interestPortion ?? 0;
-    const capitalPortion = tx.capitalPortion ?? 0;
-
-    if (interestPortion < 0) {
-      errors.push({ field: 'interestPortion', message: 'Część odsetkowa nie może być ujemna' });
-    }
-    if (capitalPortion < 0) {
-      errors.push({ field: 'capitalPortion', message: 'Część kapitałowa nie może być ujemna' });
-    }
-
-    const sum = interestPortion + capitalPortion;
-    if (tx.amount && Math.abs(sum - tx.amount) > 0.01) {
-      errors.push({
-        field: 'amount',
-        message: `Suma części (${sum.toFixed(2)}) musi być równa kwocie (${tx.amount?.toFixed(2)})`,
-      });
-    }
   }
 
   return errors;
