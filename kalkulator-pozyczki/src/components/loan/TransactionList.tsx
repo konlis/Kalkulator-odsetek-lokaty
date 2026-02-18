@@ -13,13 +13,15 @@ import { useLoanStore } from '@/hooks/use-loan-store';
 import { TransactionTypeBadge } from './TransactionTypeBadge';
 import { TransactionForm } from './TransactionForm';
 import { formatPLN, formatDatePL } from '@/lib/formatters';
-import { Plus, Pencil, Trash2, List } from 'lucide-react';
+import { ImportPdfDialog } from './ImportPdfDialog';
+import { Plus, Pencil, Trash2, List, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Transaction } from '@/types';
 
 export function TransactionList() {
   const { state, dispatch } = useLoanStore();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
 
   const handleAdd = () => {
@@ -46,10 +48,16 @@ export function TransactionList() {
               <List className="h-5 w-5" />
               Transakcje ({state.transactions.length})
             </CardTitle>
-            <Button size="sm" onClick={handleAdd}>
-              <Plus className="mr-1 h-4 w-4" />
-              Dodaj
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
+                <Upload className="mr-1 h-4 w-4" />
+                Importuj PDF
+              </Button>
+              <Button size="sm" onClick={handleAdd}>
+                <Plus className="mr-1 h-4 w-4" />
+                Dodaj
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -117,6 +125,11 @@ export function TransactionList() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         editTransaction={editTx}
+      />
+
+      <ImportPdfDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
       />
     </>
   );
