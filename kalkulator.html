@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Lokaty z Wpłatami</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .input-group input, .input-group select {
+            padding: 12px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+        
+        .payment-section {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-radius: 10px;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .btn-subtract {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            color: white;
+        }
+        
+        .btn-calculate {
+            background: linear-gradient(135deg, #007bff 0%, #6f42c1 100%);
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 18px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .summary-card h3 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        
+        .summary-card .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 15px 12px;
+            font-weight: 600;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        tr:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .positive {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .negative {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .payment-history {
+            margin-top: 30px;
+        }
+        
+        .payment-history h3 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 18px;
+        }
+        
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .payment-item.subtract {
+            border-left-color: #dc3545;
+        }
+        
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #495057;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .summary {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Kalkulator Lokaty z Wpłatami</h1>
+            <p>Oblicz zyski z lokaty z możliwością dodawania i odejmowania wpłat</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="principal">Kwota początkowa (PLN)</label>
+                    <input type="number" id="principal" value="150000" min="0" step="100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="rate">Oprocentowanie roczne (%)</label>
+                    <input type="number" id="rate" value="14" min="0" step="0.01">
+                </div>
+                
+                <div class="input-group">
+                    <label for="years">Okres lokaty (miesiące)</label>
+                    <input type="number" id="years" value="12" min="1" step="1">
+                </div>
+                
+                <div class="input-group">
+                    <label for="startDate">Data rozpoczęcia lokaty</label>
+                    <input type="date" id="startDate">
+                </div>
+                
+                <div class="input-group">
+                    <label for="compoundFreq">Kapitalizacja odsetek</label>
+                    <select id="compoundFreq">
+                        <option value="1">Roczna</option>
+                        <option value="2">Półroczna</option>
+                        <option value="4">Kwartalna</option>
+                        <option value="12" selected>Miesięczna</option>
+                        <option value="365">Dzienna</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="payment-section">
+                <div class="input-group">
+                    <label for="paymentAmount">Kwota wpłaty/wypłaty (PLN)</label>
+                    <input type="number" id="paymentAmount" value="" step="100">
+                </div>
+                
+                <div class="input-group">
+                    <label for="paymentDate">Data operacji</label>
+                    <input type="date" id="paymentDate">
+                </div>
+                
+                <button class="btn btn-add" onclick="addPayment()">+ Dodaj wpłatę</button>
+                <button class="btn btn-subtract" onclick="subtractPayment()">- Wypłata</button>
+            </div>
+            
+            <div class="payment-history">
+                <h3>Historia operacji:</h3>
+                <div id="paymentHistory"></div>
+            </div>
+            
+            <button class="btn btn-calculate" onclick="calculateDeposit()">🔄 Oblicz wartość lokaty</button>
+            
+            <div class="summary" id="summary" style="display: none;">
+                <div class="summary-card">
+                    <h3>Wartość końcowa</h3>
+                    <div class="amount" id="finalValue">0 PLN</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Suma wpłat</h3>
+                    <div class="amount" id="totalDeposits">0 PLN</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Zarobione odsetki</h3>
+                    <div class="amount" id="totalInterest">0 PLN</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Stopa zwrotu</h3>
+                    <div class="amount" id="returnRate">0%</div>
+                </div>
+            </div>
+            
+            <div class="table-container" id="tableContainer" style="display: none;">
+                <div class="chart-title">Szczegółowy przebieg lokaty</div>
+                <table id="depositTable">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Saldo początkowe</th>
+                            <th>Operacja</th>
+                            <th>Odsetki</th>
+                            <th>Saldo końcowe</th>
+                        </tr>
+                    </thead>
+                    <tbody id="depositTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let payments = [];
+        
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('pl-PL', {
+                style: 'currency',
+                currency: 'PLN'
+            }).format(amount);
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('pl-PL');
+        }
+
+        // Ustaw dzisiejszą datę jako domyślną dla rozpoczęcia lokaty
+        document.getElementById('startDate').valueAsDate = new Date();
+        // Ustaw dzisiejszą datę jako domyślną dla operacji
+        document.getElementById('paymentDate').valueAsDate = new Date();
+        
+        function addPayment() {
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const date = document.getElementById('paymentDate').value;
+            
+            if (amount > 0 && date) {
+                payments.push({ amount: amount, date: date, type: 'add' });
+                payments.sort((a, b) => new Date(a.date) - new Date(b.date));
+                updatePaymentHistory();
+                document.getElementById('paymentAmount').value = '';
+            }
+        }
+        
+        function subtractPayment() {
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const date = document.getElementById('paymentDate').value;
+            
+            if (amount > 0 && date) {
+                payments.push({ amount: -amount, date: date, type: 'subtract' });
+                payments.sort((a, b) => new Date(a.date) - new Date(b.date));
+                updatePaymentHistory();
+                document.getElementById('paymentAmount').value = '';
+            }
+        }
+        
+        function removePayment(index) {
+            payments.splice(index, 1);
+            updatePaymentHistory();
+        }
+        
+        function updatePaymentHistory() {
+            const historyDiv = document.getElementById('paymentHistory');
+            historyDiv.innerHTML = '';
+            
+            payments.forEach((payment, index) => {
+                const div = document.createElement('div');
+                div.className = `payment-item ${payment.type}`;
+                div.innerHTML = `
+                    <span>${formatDate(payment.date)}: ${formatCurrency(Math.abs(payment.amount))} ${payment.amount > 0 ? '(wpłata)' : '(wypłata)'}</span>
+                    <button class="remove-btn" onclick="removePayment(${index})">Usuń</button>
+                `;
+                historyDiv.appendChild(div);
+            });
+        }
+        
+        function calculateDeposit() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const annualRate = parseFloat(document.getElementById('rate').value) / 100;
+            const months = parseFloat(document.getElementById('years').value);
+            const years = months / 12; // Convert months to years for calculation
+            const compoundFreq = parseInt(document.getElementById('compoundFreq').value);
+            const startDate = new Date(document.getElementById('startDate').value);
+            
+            const endDate = new Date(startDate.getTime() + years * 365.25 * 24 * 60 * 60 * 1000);
+            
+            // Filtruj płatności tylko te które są w zakresie lokaty
+            const validPayments = payments.filter(payment => {
+                const paymentDate = new Date(payment.date);
+                return paymentDate >= startDate && paymentDate <= endDate;
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            let balance = principal;
+            let totalInterestEarned = 0;
+            let totalDeposited = principal;
+            
+            const tableBody = document.getElementById('depositTableBody');
+            tableBody.innerHTML = '';
+            
+            // Dodaj wiersz początkowy
+            const initialRow = tableBody.insertRow();
+            initialRow.innerHTML = `
+                <td>${formatDate(startDate)}</td>
+                <td>-</td>
+                <td class="positive">${formatCurrency(principal)}</td>
+                <td>-</td>
+                <td>${formatCurrency(balance)}</td>
+            `;
+            
+            // Symuluj dzień po dniu dla dokładniejszych obliczeń
+            let currentDate = new Date(startDate);
+            currentDate.setDate(currentDate.getDate() + 1); // Zaczynamy od dnia następnego
+            const dailyRate = annualRate / 365;
+            
+            while (currentDate <= endDate) {
+                const startBalance = balance;
+                
+                // Sprawdź czy w tym dniu są operacje
+                let dailyOperations = 0;
+                const currentDateStr = currentDate.toISOString().split('T')[0];
+                
+                validPayments.forEach(payment => {
+                    if (payment.date === currentDateStr) {
+                        dailyOperations += payment.amount;
+                        if (payment.amount > 0) totalDeposited += payment.amount;
+                    }
+                });
+                
+                // Dodaj operacje na początku dnia
+                balance += dailyOperations;
+                
+                // Oblicz odsetki na końcu dnia (od całego salda włączając dzisiejsze operacje)
+                const dailyInterest = balance * dailyRate;
+                balance += dailyInterest;
+                totalInterestEarned += dailyInterest;
+                
+                // Dodaj wiersz do tabeli tylko jeśli były operacje
+                if (dailyOperations !== 0) {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${formatDate(currentDate)}</td>
+                        <td>${formatCurrency(startBalance)}</td>
+                        <td class="${dailyOperations >= 0 ? 'positive' : 'negative'}">
+                            ${formatCurrency(dailyOperations)}
+                        </td>
+                        <td class="positive">${formatCurrency(dailyInterest)}</td>
+                        <td>${formatCurrency(balance)}</td>
+                    `;
+                }
+                
+                // Przejdź do następnego dnia
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            // Dodaj ostatni wiersz z końcowym stanem
+            const finalRow = tableBody.insertRow();
+            finalRow.innerHTML = `
+                <td><strong>${formatDate(endDate)}</strong></td>
+                <td><strong>${formatCurrency(balance - (balance * dailyRate))}</strong></td>
+                <td>-</td>
+                <td class="positive"><strong>${formatCurrency(balance * dailyRate)}</strong></td>
+                <td><strong>${formatCurrency(balance)}</strong></td>
+            `;
+            finalRow.style.backgroundColor = '#e8f5e8';
+            
+            const returnRate = totalDeposited > 0 ? ((balance - totalDeposited) / totalDeposited * 100) : 0;
+            
+            // Aktualizuj podsumowanie
+            document.getElementById('finalValue').textContent = formatCurrency(balance);
+            document.getElementById('totalDeposits').textContent = formatCurrency(totalDeposited);
+            document.getElementById('totalInterest').textContent = formatCurrency(totalInterestEarned);
+            document.getElementById('returnRate').textContent = returnRate.toFixed(2) + '%';
+            
+            // Pokaż wyniki
+            document.getElementById('summary').style.display = 'grid';
+            document.getElementById('tableContainer').style.display = 'block';
+        }
+        
+        // Początkowe obliczenie
+        calculateDeposit();
+    </script>
+</body>
+</html>

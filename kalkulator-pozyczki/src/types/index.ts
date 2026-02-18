@@ -1,0 +1,61 @@
+export type TransactionType = 'capital_deposit' | 'capital_repayment' | 'interest_payment' | 'mixed_payment';
+
+export interface Transaction {
+  id: string;
+  date: string; // 'YYYY-MM-DD'
+  type: TransactionType;
+  amount: number; // Always positive
+  interestPortion?: number; // Only for mixed_payment
+  capitalPortion?: number; // Only for mixed_payment
+  note?: string;
+}
+
+export interface LoanConfig {
+  initialCapital: number;
+  annualInterestRate: number; // e.g. 14 for 14%
+  startDate: string; // 'YYYY-MM-DD'
+  endDate?: string; // Defaults to today
+}
+
+export interface LoanState {
+  version: number;
+  config: LoanConfig;
+  transactions: Transaction[];
+}
+
+export interface DayEvent {
+  date: string;
+  principalBefore: number;
+  accruedInterestBefore: number;
+  dailyInterest: number;
+  transactionType?: TransactionType;
+  transactionAmount?: number;
+  transactionNote?: string;
+  principalAfter: number;
+  accruedInterestAfter: number;
+  totalOwed: number;
+}
+
+export interface LoanSummary {
+  currentPrincipal: number;
+  totalAccruedInterest: number;
+  totalInterestPaid: number;
+  totalCapitalRepaid: number;
+  totalCapitalDeposited: number;
+  totalOwed: number;
+  daysElapsed: number;
+  dailyInterestRate: number;
+}
+
+export interface TimelinePoint {
+  date: string;
+  principal: number;
+  accruedInterest: number;
+  totalOwed: number;
+}
+
+export interface SimulationResult {
+  events: DayEvent[];
+  summary: LoanSummary;
+  timeline: TimelinePoint[];
+}
