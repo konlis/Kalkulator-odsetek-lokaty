@@ -59,8 +59,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
   let principal = config.initialCapital;
   let accruedInterest = 0;
   let totalDeposited = config.initialCapital;
-  let totalInterestPaid = 0;
-  let totalCapitalRepaid = 0;
+  let totalWithdrawn = 0;
   let totalCapitalizedInterest = 0;
 
   const events: DayEvent[] = [];
@@ -117,12 +116,9 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
             principal += tx.amount;
             totalDeposited += tx.amount;
             break;
-          case 'interest_payment':
+          case 'withdrawal':
             accruedInterest -= tx.amount;
-            totalInterestPaid += tx.amount;
-            break;
-          case 'capital_repayment':
-            totalCapitalRepaid += tx.amount;
+            totalWithdrawn += tx.amount;
             break;
         }
 
@@ -162,8 +158,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
     currentPrincipal: principal,
     totalAccruedInterest: accruedInterest,
     totalDeposited,
-    totalInterestPaid,
-    totalCapitalRepaid,
+    totalWithdrawn,
     totalOwed: principal + accruedInterest,
     daysElapsed: totalDays,
     dailyInterestRate: dailyRate,
@@ -178,8 +173,7 @@ function emptySummary(config: LoanConfig): LoanSummary {
     currentPrincipal: config.initialCapital,
     totalAccruedInterest: 0,
     totalDeposited: config.initialCapital,
-    totalInterestPaid: 0,
-    totalCapitalRepaid: 0,
+    totalWithdrawn: 0,
     totalOwed: config.initialCapital,
     daysElapsed: 0,
     dailyInterestRate: config.annualInterestRate / 100 / 365,

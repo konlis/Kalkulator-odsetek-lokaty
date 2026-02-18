@@ -77,8 +77,7 @@ export function parseSantanderText(text: string): ParsedTransaction[] {
     const typeMatch = block.match(/Data księgowania\n\d{4}-\d{2}-\d{2}\n(.+?)(?:\n|$)/);
     const transferType = typeMatch ? typeMatch[1].trim() : '';
 
-    // Simple classification: positive = deposit, negative = interest_payment (editable by user)
-    const type: TransactionType = txAmount.sign > 0 ? 'deposit' : 'interest_payment';
+    const type: TransactionType = txAmount.sign > 0 ? 'deposit' : 'withdrawal';
 
     transactions.push({
       date,

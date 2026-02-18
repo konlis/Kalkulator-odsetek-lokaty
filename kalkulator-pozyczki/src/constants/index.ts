@@ -2,14 +2,12 @@ import type { TransactionType, CapitalizationType } from '@/types';
 
 export const TRANSACTION_TYPE_LABELS: Record<TransactionType, string> = {
   deposit: 'Wpłata',
-  interest_payment: 'Wypłata odsetek',
-  capital_repayment: 'Wypłata kapitału',
+  withdrawal: 'Wypłata',
 };
 
 export const TRANSACTION_TYPE_COLORS: Record<TransactionType, string> = {
   deposit: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  interest_payment: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
-  capital_repayment: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  withdrawal: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
 };
 
 export const DEFAULT_LOAN_CONFIG = {

@@ -1,4 +1,4 @@
-export type TransactionType = 'deposit' | 'interest_payment' | 'capital_repayment';
+export type TransactionType = 'deposit' | 'withdrawal';
 
 export type CapitalizationType = 'none' | 'daily' | 'monthly' | 'yearly';
 
@@ -41,8 +41,7 @@ export interface LoanSummary {
   currentPrincipal: number;
   totalAccruedInterest: number;
   totalDeposited: number;
-  totalInterestPaid: number;
-  totalCapitalRepaid: number;
+  totalWithdrawn: number;
   totalOwed: number;
   daysElapsed: number;
   dailyInterestRate: number;

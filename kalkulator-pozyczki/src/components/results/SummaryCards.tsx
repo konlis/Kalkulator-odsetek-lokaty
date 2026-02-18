@@ -8,7 +8,7 @@ export function SummaryCards() {
 
   const cards = [
     {
-      title: 'Pozostały kapitał',
+      title: 'Kapitał',
       value: formatPLN(summary.currentPrincipal),
       icon: Wallet,
       description: `Wpłacono: ${formatPLN(summary.totalDeposited)}`,
@@ -17,7 +17,7 @@ export function SummaryCards() {
       title: 'Odsetki do spłaty',
       value: formatPLN(summary.totalAccruedInterest),
       icon: TrendingUp,
-      description: `Wypłacono odsetek: ${formatPLN(summary.totalInterestPaid)}`,
+      description: `Wypłacono: ${formatPLN(summary.totalWithdrawn)}`,
     },
     {
       title: 'Łączne zobowiązanie',

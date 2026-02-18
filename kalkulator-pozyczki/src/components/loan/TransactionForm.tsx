@@ -30,7 +30,7 @@ interface TransactionFormProps {
 
 const emptyForm = {
   date: new Date().toISOString().slice(0, 10),
-  type: 'interest_payment' as TransactionType,
+  type: 'withdrawal' as TransactionType,
   amount: 0,
   note: '',
 };

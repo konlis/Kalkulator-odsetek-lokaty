@@ -27,8 +27,8 @@ export function loadState(): LoanState {
       const oldType = tx.type as string;
       if (oldType === 'capital_deposit') {
         tx.type = 'deposit';
-      } else if (oldType === 'mixed_payment' || oldType === 'withdrawal') {
-        tx.type = 'interest_payment';
+      } else if (oldType !== 'deposit') {
+        tx.type = 'withdrawal';
       }
     }
     return parsed;

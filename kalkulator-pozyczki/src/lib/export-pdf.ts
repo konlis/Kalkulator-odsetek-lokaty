@@ -40,11 +40,10 @@ export function downloadPDF(
   // Summary table
   const summaryBody: string[][] = [
     ['Pozostały kapitał', `${summary.currentPrincipal.toFixed(2)} PLN`],
-    ['Odsetki pozostałe do zapłaty', `${summary.totalAccruedInterest.toFixed(2)} PLN`],
+    ['Odsetki do spłaty', `${summary.totalAccruedInterest.toFixed(2)} PLN`],
     ['Łączne zobowiązanie', `${summary.totalOwed.toFixed(2)} PLN`],
     ['Łącznie wpłacono', `${summary.totalDeposited.toFixed(2)} PLN`],
-    ['Odsetki wypłacone', `${summary.totalInterestPaid.toFixed(2)} PLN`],
-    ['Kapitał wypłacony', `${summary.totalCapitalRepaid.toFixed(2)} PLN`],
+    ['Łącznie wypłacono', `${summary.totalWithdrawn.toFixed(2)} PLN`],
     ['Dni trwania', `${summary.daysElapsed}`],
   ];
   if (summary.totalCapitalizedInterest > 0) {

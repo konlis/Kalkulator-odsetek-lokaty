@@ -10,6 +10,7 @@ export function InterestBreakdown() {
 
   const dailyRate = state.config.annualInterestRate / 365;
   const dailyInterestOnCurrent = summary.currentPrincipal * (state.config.annualInterestRate / 100 / 365);
+  const totalInterestGenerated = summary.totalAccruedInterest + summary.totalWithdrawn + summary.totalCapitalizedInterest;
 
   return (
     <Card>
@@ -36,7 +37,7 @@ export function InterestBreakdown() {
           <hr className="border-border" />
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Łączne naliczone odsetki</dt>
-            <dd className="font-medium">{formatPLN(summary.totalAccruedInterest + summary.totalInterestPaid + summary.totalCapitalizedInterest)}</dd>
+            <dd className="font-medium">{formatPLN(totalInterestGenerated)}</dd>
           </div>
           {summary.totalCapitalizedInterest > 0 && (
             <div className="flex justify-between">
@@ -47,9 +48,9 @@ export function InterestBreakdown() {
             </div>
           )}
           <div className="flex justify-between">
-            <dt className="text-muted-foreground">Odsetki wypłacone</dt>
+            <dt className="text-muted-foreground">Wypłacono</dt>
             <dd className="font-medium text-green-600 dark:text-green-400">
-              {formatPLN(summary.totalInterestPaid)}
+              {formatPLN(summary.totalWithdrawn)}
             </dd>
           </div>
           <div className="flex justify-between">
@@ -62,10 +63,6 @@ export function InterestBreakdown() {
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Łącznie wpłacono</dt>
             <dd className="font-medium">{formatPLN(summary.totalDeposited)}</dd>
-          </div>
-          <div className="flex justify-between">
-            <dt className="text-muted-foreground">Kapitał wypłacony</dt>
-            <dd className="font-medium">{formatPLN(summary.totalCapitalRepaid)}</dd>
           </div>
         </dl>
       </CardContent>
