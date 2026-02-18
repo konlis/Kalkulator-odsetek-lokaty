@@ -1,7 +1,14 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { DayEvent, LoanConfig, LoanSummary } from '@/types';
-import { TRANSACTION_TYPE_LABELS } from '@/constants';
+import { TRANSACTION_TYPE_LABELS, CAPITALIZATION_LABELS } from '@/constants';
+import { ROBOTO_REGULAR_BASE64 } from './roboto-font';
+
+function registerFont(doc: jsPDF) {
+  doc.addFileToVFS('Roboto-Regular.ttf', ROBOTO_REGULAR_BASE64);
+  doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+  doc.setFont('Roboto');
+}
 
 export function downloadPDF(
   events: DayEvent[],
@@ -9,39 +16,51 @@ export function downloadPDF(
   config: LoanConfig
 ) {
   const doc = new jsPDF({ orientation: 'landscape' });
+  registerFont(doc);
 
   // Title
   doc.setFontSize(16);
-  doc.text('Kalkulator Pozyczki Inwestorskiej', 14, 15);
+  doc.text('Kalkulator Pożyczki Inwestorskiej', 14, 15);
 
   // Config summary
+  const capitalizationLabel = CAPITALIZATION_LABELS[config.capitalization ?? 'none'];
   doc.setFontSize(10);
   doc.text(
     [
-      `Kapital poczatkowy: ${config.initialCapital.toFixed(2)} PLN`,
+      `Kapitał początkowy: ${config.initialCapital.toFixed(2)} PLN`,
       `Oprocentowanie: ${config.annualInterestRate}%`,
+      `Kapitalizacja: ${capitalizationLabel}`,
       `Data startu: ${config.startDate}`,
-      `Data konca: ${config.endDate ?? 'dzis'}`,
+      `Data końca: ${config.endDate ?? 'dziś'}`,
     ].join('   |   '),
     14,
     25
   );
 
   // Summary table
+  const summaryBody: string[][] = [
+    ['Pozostały kapitał', `${summary.currentPrincipal.toFixed(2)} PLN`],
+    ['Odsetki pozostałe do zapłaty', `${summary.totalAccruedInterest.toFixed(2)} PLN`],
+    ['Łączne zobowiązanie', `${summary.totalOwed.toFixed(2)} PLN`],
+    ['Odsetki zapłacone', `${summary.totalInterestPaid.toFixed(2)} PLN`],
+    ['Kapitał spłacony', `${summary.totalCapitalRepaid.toFixed(2)} PLN`],
+    ['Dni trwania', `${summary.daysElapsed}`],
+  ];
+  if (summary.totalCapitalizedInterest > 0) {
+    summaryBody.splice(2, 0,
+      ['Odsetki skapitalizowane', `${summary.totalCapitalizedInterest.toFixed(2)} PLN`],
+    );
+  }
+
+  const fontStyles = { font: 'Roboto' as const };
+
   autoTable(doc, {
     startY: 32,
-    head: [['Wskaznik', 'Wartosc']],
-    body: [
-      ['Pozostaly kapital', `${summary.currentPrincipal.toFixed(2)} PLN`],
-      ['Naliczone odsetki', `${summary.totalAccruedInterest.toFixed(2)} PLN`],
-      ['Laczne zobowiazanie', `${summary.totalOwed.toFixed(2)} PLN`],
-      ['Odsetki zaplacone', `${summary.totalInterestPaid.toFixed(2)} PLN`],
-      ['Kapital splacony', `${summary.totalCapitalRepaid.toFixed(2)} PLN`],
-      ['Dni trwania', `${summary.daysElapsed}`],
-    ],
+    head: [['Wskaźnik', 'Wartość']],
+    body: summaryBody,
     theme: 'grid',
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [41, 128, 185] },
+    styles: { fontSize: 9, ...fontStyles },
+    headStyles: { fillColor: [41, 128, 185], ...fontStyles },
   });
 
   // Events with transactions only
@@ -50,7 +69,7 @@ export function downloadPDF(
   if (txEvents.length > 0) {
     autoTable(doc, {
       startY: (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10,
-      head: [['Data', 'Typ', 'Kwota', 'Odsetki dnia', 'Kapital po', 'Odsetki po', 'Lacznie']],
+      head: [['Data', 'Typ', 'Kwota', 'Odsetki dnia', 'Kapitał po', 'Odsetki po', 'Łącznie']],
       body: txEvents.map((e) => [
         e.date,
         e.transactionType ? TRANSACTION_TYPE_LABELS[e.transactionType] : '',
@@ -61,8 +80,8 @@ export function downloadPDF(
         e.totalOwed.toFixed(2),
       ]),
       theme: 'striped',
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [41, 128, 185] },
+      styles: { fontSize: 8, ...fontStyles },
+      headStyles: { fillColor: [41, 128, 185], ...fontStyles },
     });
   }
 

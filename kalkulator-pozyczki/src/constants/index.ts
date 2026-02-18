@@ -1,4 +1,4 @@
-import type { TransactionType } from '@/types';
+import type { TransactionType, CapitalizationType } from '@/types';
 
 export const TRANSACTION_TYPE_LABELS: Record<TransactionType, string> = {
   capital_deposit: 'Wpłata kapitału',
@@ -18,6 +18,14 @@ export const DEFAULT_LOAN_CONFIG = {
   initialCapital: 150000,
   annualInterestRate: 14,
   startDate: new Date().toISOString().slice(0, 10),
+  capitalization: 'none' as CapitalizationType,
+};
+
+export const CAPITALIZATION_LABELS: Record<CapitalizationType, string> = {
+  none: 'Brak (odsetki proste)',
+  daily: 'Dzienna',
+  monthly: 'Miesięczna',
+  yearly: 'Roczna',
 };
 
 export const STORAGE_KEY = 'kalkulator-pozyczki-state';

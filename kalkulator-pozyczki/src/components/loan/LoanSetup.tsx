@@ -3,8 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useLoanStore } from '@/hooks/use-loan-store';
 import { validateLoanConfig } from '@/lib/validators';
+import { CAPITALIZATION_LABELS } from '@/constants';
+import type { CapitalizationType } from '@/types';
 import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -78,6 +87,28 @@ export function LoanSetup() {
                 setConfig((c) => ({ ...c, endDate: e.target.value || undefined }))
               }
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Kapitalizacja odsetek</Label>
+            <Select
+              value={config.capitalization ?? 'none'}
+              onValueChange={(val: CapitalizationType) =>
+                setConfig((c) => ({ ...c, capitalization: val }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.entries(CAPITALIZATION_LABELS) as [CapitalizationType, string][]).map(
+                  ([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  )
+                )}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <Button onClick={handleSave} className="w-full sm:w-auto">

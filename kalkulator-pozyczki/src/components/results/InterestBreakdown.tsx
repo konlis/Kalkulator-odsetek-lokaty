@@ -36,8 +36,16 @@ export function InterestBreakdown() {
           <hr className="border-border" />
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Łączne naliczone odsetki</dt>
-            <dd className="font-medium">{formatPLN(summary.totalAccruedInterest + summary.totalInterestPaid)}</dd>
+            <dd className="font-medium">{formatPLN(summary.totalAccruedInterest + summary.totalInterestPaid + summary.totalCapitalizedInterest)}</dd>
           </div>
+          {summary.totalCapitalizedInterest > 0 && (
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Skapitalizowane (dodane do kapitału)</dt>
+              <dd className="font-medium text-blue-600 dark:text-blue-400">
+                {formatPLN(summary.totalCapitalizedInterest)}
+              </dd>
+            </div>
+          )}
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Odsetki zapłacone</dt>
             <dd className="font-medium text-green-600 dark:text-green-400">

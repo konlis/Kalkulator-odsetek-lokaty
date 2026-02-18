@@ -6,6 +6,7 @@ import type {
   LoanSummary,
   TimelinePoint,
   SimulationResult,
+  CapitalizationType,
 } from '@/types';
 
 function groupTransactionsByDate(transactions: Transaction[]): Map<string, Transaction[]> {
@@ -21,10 +22,36 @@ function groupTransactionsByDate(transactions: Transaction[]): Map<string, Trans
   return map;
 }
 
+/**
+ * Check if capitalization should happen on this date.
+ *
+ * - daily: every day
+ * - monthly: on the 1st of each month (capitalizes interest from the previous month)
+ * - yearly: on Jan 1st (capitalizes interest from the previous year)
+ * - none: never
+ */
+function shouldCapitalize(
+  capitalization: CapitalizationType,
+  currentDate: Date,
+  prevDate: Date,
+): boolean {
+  if (capitalization === 'none') return false;
+  if (capitalization === 'daily') return true;
+  if (capitalization === 'monthly') {
+    return currentDate.getMonth() !== prevDate.getMonth() ||
+           currentDate.getFullYear() !== prevDate.getFullYear();
+  }
+  if (capitalization === 'yearly') {
+    return currentDate.getFullYear() !== prevDate.getFullYear();
+  }
+  return false;
+}
+
 export function simulateLoan(config: LoanConfig, transactions: Transaction[]): SimulationResult {
   const startDate = parseISO(config.startDate);
   const endDate = config.endDate ? parseISO(config.endDate) : new Date();
   const totalDays = differenceInDays(endDate, startDate);
+  const capitalization = config.capitalization ?? 'none';
 
   if (totalDays < 0) {
     return {
@@ -42,6 +69,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
   let totalInterestPaid = 0;
   let totalCapitalRepaid = 0;
   let totalCapitalDeposited = config.initialCapital;
+  let totalCapitalizedInterest = 0;
 
   const events: DayEvent[] = [];
   const timeline: TimelinePoint[] = [];
@@ -69,15 +97,26 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
 
   for (let day = 1; day <= totalDays; day++) {
     const currentDate = addDays(startDate, day);
+    const prevDate = addDays(startDate, day - 1);
     const dateStr = format(currentDate, 'yyyy-MM-dd');
 
     const principalBefore = principal;
     const accruedInterestBefore = accruedInterest;
 
-    // Accrue daily interest on principal only
+    // 1. Capitalize interest if applicable (before accruing today's interest)
+    //    Capitalization moves accrued interest → principal so it compounds.
+    if (shouldCapitalize(capitalization, currentDate, prevDate) && accruedInterest > 0) {
+      const capitalized = accruedInterest;
+      principal += capitalized;
+      totalCapitalizedInterest += capitalized;
+      accruedInterest = 0;
+    }
+
+    // 2. Accrue daily interest on current principal
     const dailyInterest = principal * dailyRate;
     accruedInterest += dailyInterest;
 
+    // 3. Process transactions
     const dayTransactions = txByDate.get(dateStr);
 
     if (dayTransactions) {
@@ -121,7 +160,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
       }
     }
 
-    // Add timeline point (sample: every day if <=365, every 7 days if more, always on tx days and last day)
+    // Add timeline point
     const shouldAddTimeline =
       dayTransactions ||
       day === totalDays ||
@@ -147,6 +186,7 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
     totalOwed: principal + accruedInterest,
     daysElapsed: totalDays,
     dailyInterestRate: dailyRate,
+    totalCapitalizedInterest,
   };
 
   return { events, summary, timeline };
@@ -162,5 +202,6 @@ function emptySummary(config: LoanConfig): LoanSummary {
     totalOwed: config.initialCapital,
     daysElapsed: 0,
     dailyInterestRate: config.annualInterestRate / 100 / 365,
+    totalCapitalizedInterest: 0,
   };
 }

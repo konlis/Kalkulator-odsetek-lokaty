@@ -1,5 +1,7 @@
 export type TransactionType = 'capital_deposit' | 'capital_repayment' | 'interest_payment' | 'mixed_payment';
 
+export type CapitalizationType = 'none' | 'daily' | 'monthly' | 'yearly';
+
 export interface Transaction {
   id: string;
   date: string; // 'YYYY-MM-DD'
@@ -15,6 +17,7 @@ export interface LoanConfig {
   annualInterestRate: number; // e.g. 14 for 14%
   startDate: string; // 'YYYY-MM-DD'
   endDate?: string; // Defaults to today
+  capitalization: CapitalizationType; // Interest compounding frequency
 }
 
 export interface LoanState {
@@ -45,6 +48,7 @@ export interface LoanSummary {
   totalOwed: number;
   daysElapsed: number;
   dailyInterestRate: number;
+  totalCapitalizedInterest: number;
 }
 
 export interface TimelinePoint {

@@ -31,9 +31,10 @@ export function generateCSV(events: DayEvent[], summary: LoanSummary): string {
     '',
     'PODSUMOWANIE',
     `Pozostały kapitał;${summary.currentPrincipal.toFixed(2)}`,
-    `Naliczone odsetki;${summary.totalAccruedInterest.toFixed(2)}`,
+    `Odsetki pozostałe do zapłaty;${summary.totalAccruedInterest.toFixed(2)}`,
     `Łączne zobowiązanie;${summary.totalOwed.toFixed(2)}`,
     `Odsetki zapłacone;${summary.totalInterestPaid.toFixed(2)}`,
+    `Odsetki skapitalizowane;${summary.totalCapitalizedInterest.toFixed(2)}`,
     `Kapitał spłacony;${summary.totalCapitalRepaid.toFixed(2)}`,
     `Dni trwania;${summary.daysElapsed}`,
   ];

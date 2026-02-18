@@ -14,22 +14,24 @@ export function SummaryCards() {
       description: `Wpłacono: ${formatPLN(summary.totalCapitalDeposited)}`,
     },
     {
-      title: 'Naliczone odsetki',
+      title: 'Odsetki do zapłaty',
       value: formatPLN(summary.totalAccruedInterest),
       icon: TrendingUp,
-      description: 'Do zapłaty',
+      description: `Zapłacono: ${formatPLN(summary.totalInterestPaid)}`,
     },
     {
       title: 'Łączne zobowiązanie',
       value: formatPLN(summary.totalOwed),
       icon: ArrowDownCircle,
-      description: `Spłacono odsetek: ${formatPLN(summary.totalInterestPaid)}`,
+      description: `Spłacono kapitału: ${formatPLN(summary.totalCapitalRepaid)}`,
     },
     {
       title: 'Czas trwania',
       value: `${summary.daysElapsed} dni`,
       icon: Calendar,
-      description: `Spłacono kapitału: ${formatPLN(summary.totalCapitalRepaid)}`,
+      description: summary.totalCapitalizedInterest > 0
+        ? `Skapitalizowano: ${formatPLN(summary.totalCapitalizedInterest)}`
+        : `Dziennie: ${formatPLN(summary.currentPrincipal * summary.dailyInterestRate)}`,
     },
   ];
 

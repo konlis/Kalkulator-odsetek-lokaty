@@ -18,6 +18,10 @@ export function loadState(): LoanState {
     if (parsed.version !== STORAGE_VERSION) {
       return getDefaultState();
     }
+    // Backward compat: add capitalization if missing
+    if (!parsed.config.capitalization) {
+      parsed.config.capitalization = 'none';
+    }
     return parsed;
   } catch {
     return getDefaultState();
