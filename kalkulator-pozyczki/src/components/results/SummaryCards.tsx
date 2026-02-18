@@ -16,8 +16,8 @@ export function SummaryCards() {
       description: `Wpłacono: ${formatPLN(summary.totalDeposited)}`,
     },
     {
-      title: 'Odsetki do zapłaty',
-      value: formatPLN(summary.totalAccruedInterest),
+      title: 'Odsetki należne',
+      value: `${formatPLN(summary.totalAccruedInterest)}${summary.totalAccruedInterest < 0 ? ' (nadpłata)' : ''}`,
       icon: TrendingUp,
       description: `Wypłacono: ${formatPLN(totalWithdrawn)}`,
     },

@@ -118,11 +118,10 @@ export function simulateLoan(config: LoanConfig, transactions: Transaction[]): S
             totalDeposited += tx.amount;
             break;
           case 'interest_payment':
-            accruedInterest = Math.max(0, accruedInterest - tx.amount);
+            accruedInterest -= tx.amount;
             totalInterestPaid += tx.amount;
             break;
           case 'capital_repayment':
-            principal = Math.max(0, principal - tx.amount);
             totalCapitalRepaid += tx.amount;
             break;
         }
