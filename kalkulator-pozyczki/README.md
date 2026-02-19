@@ -4,17 +4,19 @@ Aplikacja do śledzenia pożyczek inwestorskich z naliczaniem odsetek dziennych 
 
 ## Funkcje
 
-- Konfiguracja pożyczki (kapitał, oprocentowanie, daty)
-- Transakcje: wpłata kapitału, spłata kapitału, płatność odsetek, płatność mieszana
-- Edycja i usuwanie transakcji
-- Symulacja dzień-po-dniu z naliczaniem odsetek od kapitału (nie kompoundowane)
+- **Wiele pożyczek** — zakładki na górze, dodawanie/usuwanie/zmiana nazwy pożyczek
+- **Waluta PLN / USD** — wybór waluty per pożyczka, formatowanie kwot w odpowiedniej walucie
+- Konfiguracja pożyczki (kapitał, oprocentowanie, daty, kapitalizacja odsetek)
+- Transakcje: wpłata i wypłata z edycją i usuwaniem
+- Symulacja dzień-po-dniu z naliczaniem odsetek od kapitału
+- Kapitalizacja odsetek (brak / dzienna / miesięczna / roczna)
 - 4 karty KPI z podsumowaniem
 - Wykres salda w czasie (Recharts)
 - Tabela szczegółowych zdarzeń
 - Import transakcji z wyciągu PDF Santander Bank
-- Eksport do PDF i CSV
+- Eksport do PDF i CSV (z poprawną walutą)
 - Dark mode
-- Dane zapisywane w localStorage
+- Dane zapisywane w localStorage (automatyczna migracja starszych wersji)
 
 ## Tech stack
 
