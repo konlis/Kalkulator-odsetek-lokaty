@@ -57,6 +57,24 @@ export function downloadPDF(
     );
   }
 
+  // Exchange rate info
+  if (config.investorCurrency === 'USD' && config.exchangeRateAtStart && config.exchangeRateCurrent) {
+    const fmtUsd = (amount: number) => formatCurrency(amount, 'USD');
+    const investedUsd = config.initialCapital / config.exchangeRateAtStart;
+    const currentValueUsd = summary.totalOwed / config.exchangeRateCurrent;
+    const exchangeGainLoss = currentValueUsd - (summary.totalOwed / config.exchangeRateAtStart);
+
+    summaryBody.push(
+      ['', ''],
+      ['PRZELICZNIK USD', ''],
+      ['Kurs PLN/USD w dniu pożyczki', config.exchangeRateAtStart.toFixed(4)],
+      ['Bieżący kurs PLN/USD', config.exchangeRateCurrent.toFixed(4)],
+      ['Zainwestowano (USD)', fmtUsd(investedUsd)],
+      ['Wartość bieżąca (USD)', fmtUsd(currentValueUsd)],
+      ['Zysk/strata na kursie', fmtUsd(exchangeGainLoss)],
+    );
+  }
+
   const fontStyles = { font: 'Roboto' as const };
 
   autoTable(doc, {

@@ -130,6 +130,71 @@ export function LoanSetup() {
             </Select>
           </div>
         </div>
+
+        {config.currency === 'PLN' && (
+          <div className="space-y-3 rounded-md border p-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="enableExchangeRate"
+                checked={!!config.investorCurrency}
+                onChange={(e) =>
+                  setConfig((c) => ({
+                    ...c,
+                    investorCurrency: e.target.checked ? 'USD' : undefined,
+                    exchangeRateAtStart: e.target.checked ? c.exchangeRateAtStart : undefined,
+                    exchangeRateCurrent: e.target.checked ? c.exchangeRateCurrent : undefined,
+                  }))
+                }
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Label htmlFor="enableExchangeRate" className="cursor-pointer">
+                Przelicznik walutowy (inwestor operuje w USD)
+              </Label>
+            </div>
+            {config.investorCurrency && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="exchangeRateAtStart">Kurs PLN/USD w dniu pożyczki</Label>
+                  <Input
+                    id="exchangeRateAtStart"
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    placeholder="np. 4.05"
+                    value={config.exchangeRateAtStart ?? ''}
+                    onChange={(e) =>
+                      setConfig((c) => ({
+                        ...c,
+                        exchangeRateAtStart: parseFloat(e.target.value) || undefined,
+                      }))
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">Ile PLN za 1 USD w dniu udzielenia</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="exchangeRateCurrent">Bieżący kurs PLN/USD</Label>
+                  <Input
+                    id="exchangeRateCurrent"
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    placeholder="np. 3.90"
+                    value={config.exchangeRateCurrent ?? ''}
+                    onChange={(e) =>
+                      setConfig((c) => ({
+                        ...c,
+                        exchangeRateCurrent: parseFloat(e.target.value) || undefined,
+                      }))
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">Ile PLN za 1 USD dzisiaj</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <Button onClick={handleSave} className="w-full sm:w-auto">
           Zapisz konfigurację
         </Button>

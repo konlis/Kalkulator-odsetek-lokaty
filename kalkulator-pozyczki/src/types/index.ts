@@ -19,6 +19,10 @@ export interface LoanConfig {
   endDate?: string; // Defaults to today
   capitalization: CapitalizationType; // Interest compounding frequency
   currency: Currency;
+  // Exchange rate tracking: when loan is in PLN but investor operates in USD
+  investorCurrency?: 'USD';
+  exchangeRateAtStart?: number;  // PLN per 1 USD at loan start (e.g. 4.05)
+  exchangeRateCurrent?: number;  // Current PLN per 1 USD (e.g. 3.90)
 }
 
 export interface Loan {

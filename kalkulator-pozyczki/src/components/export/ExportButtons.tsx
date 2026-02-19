@@ -21,7 +21,7 @@ export function ExportButtons() {
 
   const handleCSV = () => {
     try {
-      downloadCSV(events, summary, activeLoan.config.currency);
+      downloadCSV(events, summary, activeLoan.config);
       toast.success('CSV wygenerowany');
     } catch {
       toast.error('Błąd generowania CSV');

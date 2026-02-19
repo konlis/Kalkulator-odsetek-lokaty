@@ -1,9 +1,10 @@
-import type { DayEvent, LoanSummary, Currency } from '@/types';
+import type { DayEvent, LoanSummary, LoanConfig } from '@/types';
 import { TRANSACTION_TYPE_LABELS } from '@/constants';
 import { formatCurrency } from './formatters';
 
-export function generateCSV(events: DayEvent[], summary: LoanSummary, currency: Currency): string {
+export function generateCSV(events: DayEvent[], summary: LoanSummary, config: LoanConfig): string {
   const BOM = '\uFEFF'; // UTF-8 BOM for Excel compatibility
+  const currency = config.currency ?? 'PLN';
   const fmt = (amount: number) => formatCurrency(amount, currency);
 
   const header = [
@@ -42,11 +43,29 @@ export function generateCSV(events: DayEvent[], summary: LoanSummary, currency: 
     `Dni trwania;${summary.daysElapsed}`,
   ];
 
+  // Exchange rate info
+  if (config.investorCurrency === 'USD' && config.exchangeRateAtStart && config.exchangeRateCurrent) {
+    const fmtUsd = (amount: number) => formatCurrency(amount, 'USD');
+    const investedUsd = config.initialCapital / config.exchangeRateAtStart;
+    const currentValueUsd = summary.totalOwed / config.exchangeRateCurrent;
+    const exchangeGainLoss = currentValueUsd - (summary.totalOwed / config.exchangeRateAtStart);
+
+    summaryRows.push(
+      '',
+      'PRZELICZNIK USD',
+      `Kurs PLN/USD w dniu pożyczki;${config.exchangeRateAtStart.toFixed(4)}`,
+      `Bieżący kurs PLN/USD;${config.exchangeRateCurrent.toFixed(4)}`,
+      `Zainwestowano (USD);${fmtUsd(investedUsd)}`,
+      `Wartość bieżąca (USD);${fmtUsd(currentValueUsd)}`,
+      `Zysk/strata na kursie;${fmtUsd(exchangeGainLoss)}`,
+    );
+  }
+
   return BOM + [header, ...rows, ...summaryRows].join('\n');
 }
 
-export function downloadCSV(events: DayEvent[], summary: LoanSummary, currency: Currency) {
-  const csv = generateCSV(events, summary, currency);
+export function downloadCSV(events: DayEvent[], summary: LoanSummary, config: LoanConfig) {
+  const csv = generateCSV(events, summary, config);
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
