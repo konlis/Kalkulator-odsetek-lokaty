@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCalculation } from '@/hooks/use-calculation';
+import { useLoanStore } from '@/hooks/use-loan-store';
 import {
   AreaChart,
   Area,
@@ -10,11 +11,13 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { formatPLN } from '@/lib/formatters';
+import { formatCurrency } from '@/lib/formatters';
 import { TrendingUp } from 'lucide-react';
 
 export function Timeline() {
   const { timeline } = useCalculation();
+  const { activeLoan } = useLoanStore();
+  const currency = activeLoan.config.currency;
 
   if (timeline.length < 2) {
     return null;
@@ -45,7 +48,7 @@ export function Timeline() {
               />
               <Tooltip
                 formatter={(value, name) => [
-                  formatPLN(Number(value)),
+                  formatCurrency(Number(value), currency),
                   name === 'principal'
                     ? 'Kapitał'
                     : name === 'accruedInterest'

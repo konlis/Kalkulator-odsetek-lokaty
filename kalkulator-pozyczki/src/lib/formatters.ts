@@ -1,13 +1,19 @@
 import { format, parseISO } from 'date-fns';
 import { pl } from 'date-fns/locale';
+import type { Currency } from '@/types';
 
-export function formatPLN(amount: number): string {
-  return new Intl.NumberFormat('pl-PL', {
+export function formatCurrency(amount: number, currency: Currency): string {
+  const locale = currency === 'PLN' ? 'pl-PL' : 'en-US';
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'PLN',
+    currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
+}
+
+export function formatPLN(amount: number): string {
+  return formatCurrency(amount, 'PLN');
 }
 
 export function formatDatePL(dateStr: string): string {

@@ -13,13 +13,13 @@ import {
 import { useLoanStore } from '@/hooks/use-loan-store';
 import { validateLoanConfig } from '@/lib/validators';
 import { CAPITALIZATION_LABELS } from '@/constants';
-import type { CapitalizationType } from '@/types';
+import type { CapitalizationType, Currency } from '@/types';
 import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function LoanSetup() {
-  const { state, dispatch } = useLoanStore();
-  const [config, setConfig] = useState(state.config);
+  const { activeLoan, dispatch } = useLoanStore();
+  const [config, setConfig] = useState(activeLoan.config);
 
   const handleSave = () => {
     const errors = validateLoanConfig(config);
@@ -30,6 +30,8 @@ export function LoanSetup() {
     dispatch({ type: 'SET_CONFIG', payload: config });
     toast.success('Konfiguracja zapisana');
   };
+
+  const currencyLabel = config.currency === 'USD' ? 'USD' : 'PLN';
 
   return (
     <Card>
@@ -42,7 +44,7 @@ export function LoanSetup() {
       <CardContent className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="initialCapital">Kapitał początkowy (PLN)</Label>
+            <Label htmlFor="initialCapital">Kapitał początkowy ({currencyLabel})</Label>
             <Input
               id="initialCapital"
               type="number"
@@ -107,6 +109,23 @@ export function LoanSetup() {
                     </SelectItem>
                   )
                 )}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Waluta</Label>
+            <Select
+              value={config.currency ?? 'PLN'}
+              onValueChange={(val: Currency) =>
+                setConfig((c) => ({ ...c, currency: val }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PLN">PLN (złoty)</SelectItem>
+                <SelectItem value="USD">USD (dolar)</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -10,12 +10,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useCalculation } from '@/hooks/use-calculation';
+import { useLoanStore } from '@/hooks/use-loan-store';
 import { TransactionTypeBadge } from '@/components/loan/TransactionTypeBadge';
-import { formatPLN, formatDatePL } from '@/lib/formatters';
+import { formatCurrency, formatDatePL } from '@/lib/formatters';
 import { TableIcon, Eye, EyeOff } from 'lucide-react';
 
 export function DetailTable() {
   const { events } = useCalculation();
+  const { activeLoan } = useLoanStore();
+  const fmt = (amount: number) => formatCurrency(amount, activeLoan.config.currency);
   const [showAll, setShowAll] = useState(false);
 
   // Filter: only events with transactions, unless showAll
@@ -80,19 +83,19 @@ export function DetailTable() {
                     )}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
-                    {event.transactionAmount ? formatPLN(event.transactionAmount) : '—'}
+                    {event.transactionAmount ? fmt(event.transactionAmount) : '—'}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
-                    {formatPLN(event.dailyInterest)}
+                    {fmt(event.dailyInterest)}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
-                    {formatPLN(event.principalAfter)}
+                    {fmt(event.principalAfter)}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
-                    {formatPLN(event.accruedInterestAfter)}
+                    {fmt(event.accruedInterestAfter)}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap font-medium">
-                    {formatPLN(event.totalOwed)}
+                    {fmt(event.totalOwed)}
                   </TableCell>
                 </TableRow>
               ))}

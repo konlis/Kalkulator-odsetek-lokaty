@@ -4,10 +4,10 @@ import { useLoanStore } from './use-loan-store';
 import type { SimulationResult } from '@/types';
 
 export function useCalculation(): SimulationResult {
-  const { state } = useLoanStore();
+  const { activeLoan } = useLoanStore();
 
   return useMemo(
-    () => simulateLoan(state.config, state.transactions),
-    [state.config, state.transactions]
+    () => simulateLoan(activeLoan.config, activeLoan.transactions),
+    [activeLoan.config, activeLoan.transactions]
   );
 }

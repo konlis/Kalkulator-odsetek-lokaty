@@ -1,37 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCalculation } from '@/hooks/use-calculation';
-import { formatPLN } from '@/lib/formatters';
+import { useLoanStore } from '@/hooks/use-loan-store';
+import { formatCurrency } from '@/lib/formatters';
 import { Wallet, TrendingUp, ArrowDownCircle, Calendar } from 'lucide-react';
 
 export function SummaryCards() {
   const { summary } = useCalculation();
+  const { activeLoan } = useLoanStore();
+  const fmt = (amount: number) => formatCurrency(amount, activeLoan.config.currency);
 
   const cards = [
     {
       title: 'Kapitał',
-      value: formatPLN(summary.currentPrincipal),
+      value: fmt(summary.currentPrincipal),
       icon: Wallet,
-      description: `Wpłacono: ${formatPLN(summary.totalDeposited)}`,
+      description: `Wpłacono: ${fmt(summary.totalDeposited)}`,
     },
     {
       title: 'Odsetki do spłaty',
-      value: formatPLN(summary.totalAccruedInterest),
+      value: fmt(summary.totalAccruedInterest),
       icon: TrendingUp,
-      description: `Wypłacono: ${formatPLN(summary.totalWithdrawn)}`,
+      description: `Wypłacono: ${fmt(summary.totalWithdrawn)}`,
     },
     {
       title: 'Łączne zobowiązanie',
-      value: formatPLN(summary.totalOwed),
+      value: fmt(summary.totalOwed),
       icon: ArrowDownCircle,
       description: summary.totalCapitalizedInterest > 0
-        ? `Skapitalizowano: ${formatPLN(summary.totalCapitalizedInterest)}`
+        ? `Skapitalizowano: ${fmt(summary.totalCapitalizedInterest)}`
         : 'Kapitał + odsetki',
     },
     {
       title: 'Czas trwania',
       value: `${summary.daysElapsed} dni`,
       icon: Calendar,
-      description: `Dziennie: ${formatPLN(summary.currentPrincipal * summary.dailyInterestRate)}`,
+      description: `Dziennie: ${fmt(summary.currentPrincipal * summary.dailyInterestRate)}`,
     },
   ];
 

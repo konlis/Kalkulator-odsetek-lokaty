@@ -15,6 +15,7 @@ export const DEFAULT_LOAN_CONFIG = {
   annualInterestRate: 14,
   startDate: new Date().toISOString().slice(0, 10),
   capitalization: 'none' as CapitalizationType,
+  currency: 'PLN' as const,
 };
 
 export const CAPITALIZATION_LABELS: Record<CapitalizationType, string> = {
@@ -25,6 +26,6 @@ export const CAPITALIZATION_LABELS: Record<CapitalizationType, string> = {
 };
 
 export const STORAGE_KEY = 'kalkulator-pozyczki-state';
-export const STORAGE_VERSION = 1;
+export const STORAGE_VERSION = 2;
 
 export const APP_TITLE = 'Kalkulator Pożyczki Inwestorskiej';

@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { useLoanStore } from '@/hooks/use-loan-store';
 import { TRANSACTION_TYPE_LABELS } from '@/constants';
-import { formatPLN, formatDatePL } from '@/lib/formatters';
+import { formatCurrency, formatDatePL } from '@/lib/formatters';
 import { extractTextFromPdf, parseSantanderText } from '@/lib/import-santander';
 import type { ParsedTransaction } from '@/lib/import-santander';
 import type { TransactionType } from '@/types';
@@ -38,7 +38,8 @@ interface ImportPdfDialogProps {
 }
 
 export function ImportPdfDialog({ open, onOpenChange }: ImportPdfDialogProps) {
-  const { dispatch } = useLoanStore();
+  const { dispatch, activeLoan } = useLoanStore();
+  const fmt = (amount: number) => formatCurrency(amount, activeLoan.config.currency);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [parsed, setParsed] = useState<ParsedTransaction[]>([]);
@@ -220,7 +221,7 @@ export function ImportPdfDialog({ open, onOpenChange }: ImportPdfDialogProps) {
                         {formatDatePL(tx.date)}
                       </TableCell>
                       <TableCell className="text-right whitespace-nowrap">
-                        {formatPLN(tx.amount)}
+                        {fmt(tx.amount)}
                       </TableCell>
                       <TableCell>
                         <Select

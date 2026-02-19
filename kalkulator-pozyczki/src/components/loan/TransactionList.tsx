@@ -12,14 +12,15 @@ import {
 import { useLoanStore } from '@/hooks/use-loan-store';
 import { TransactionTypeBadge } from './TransactionTypeBadge';
 import { TransactionForm } from './TransactionForm';
-import { formatPLN, formatDatePL } from '@/lib/formatters';
+import { formatCurrency, formatDatePL } from '@/lib/formatters';
 import { ImportPdfDialog } from './ImportPdfDialog';
 import { Plus, Pencil, Trash2, List, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Transaction } from '@/types';
 
 export function TransactionList() {
-  const { state, dispatch } = useLoanStore();
+  const { dispatch, activeLoan } = useLoanStore();
+  const fmt = (amount: number) => formatCurrency(amount, activeLoan.config.currency);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [editTx, setEditTx] = useState<Transaction | null>(null);
@@ -46,7 +47,7 @@ export function TransactionList() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <List className="h-5 w-5" />
-              Transakcje ({state.transactions.length})
+              Transakcje ({activeLoan.transactions.length})
             </CardTitle>
             <div className="flex gap-2">
               <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>
@@ -61,7 +62,7 @@ export function TransactionList() {
           </div>
         </CardHeader>
         <CardContent>
-          {state.transactions.length === 0 ? (
+          {activeLoan.transactions.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               Brak transakcji. Kliknij &quot;Dodaj&quot; aby dodać pierwszą transakcję.
             </p>
@@ -78,7 +79,7 @@ export function TransactionList() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {state.transactions.map((tx) => (
+                  {activeLoan.transactions.map((tx) => (
                     <TableRow key={tx.id}>
                       <TableCell className="whitespace-nowrap">
                         {formatDatePL(tx.date)}
@@ -87,7 +88,7 @@ export function TransactionList() {
                         <TransactionTypeBadge type={tx.type} />
                       </TableCell>
                       <TableCell className="text-right whitespace-nowrap">
-                        {formatPLN(tx.amount)}
+                        {fmt(tx.amount)}
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground max-w-[200px] truncate">
                         {tx.note || '—'}

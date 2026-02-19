@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { DayEvent, LoanConfig, LoanSummary } from '@/types';
 import { TRANSACTION_TYPE_LABELS, CAPITALIZATION_LABELS } from '@/constants';
+import { formatCurrency } from './formatters';
 import { ROBOTO_REGULAR_BASE64 } from './roboto-font';
 
 function registerFont(doc: jsPDF) {
@@ -18,6 +19,9 @@ export function downloadPDF(
   const doc = new jsPDF({ orientation: 'landscape' });
   registerFont(doc);
 
+  const currency = config.currency ?? 'PLN';
+  const fmt = (amount: number) => formatCurrency(amount, currency);
+
   // Title
   doc.setFontSize(16);
   doc.text('Kalkulator Pożyczki Inwestorskiej', 14, 15);
@@ -27,9 +31,10 @@ export function downloadPDF(
   doc.setFontSize(10);
   doc.text(
     [
-      `Kapitał początkowy: ${config.initialCapital.toFixed(2)} PLN`,
+      `Kapitał początkowy: ${fmt(config.initialCapital)}`,
       `Oprocentowanie: ${config.annualInterestRate}%`,
       `Kapitalizacja: ${capitalizationLabel}`,
+      `Waluta: ${currency}`,
       `Data startu: ${config.startDate}`,
       `Data końca: ${config.endDate ?? 'dziś'}`,
     ].join('   |   '),
@@ -39,16 +44,16 @@ export function downloadPDF(
 
   // Summary table
   const summaryBody: string[][] = [
-    ['Pozostały kapitał', `${summary.currentPrincipal.toFixed(2)} PLN`],
-    ['Odsetki do spłaty', `${summary.totalAccruedInterest.toFixed(2)} PLN`],
-    ['Łączne zobowiązanie', `${summary.totalOwed.toFixed(2)} PLN`],
-    ['Łącznie wpłacono', `${summary.totalDeposited.toFixed(2)} PLN`],
-    ['Łącznie wypłacono', `${summary.totalWithdrawn.toFixed(2)} PLN`],
+    ['Pozostały kapitał', fmt(summary.currentPrincipal)],
+    ['Odsetki do spłaty', fmt(summary.totalAccruedInterest)],
+    ['Łączne zobowiązanie', fmt(summary.totalOwed)],
+    ['Łącznie wpłacono', fmt(summary.totalDeposited)],
+    ['Łącznie wypłacono', fmt(summary.totalWithdrawn)],
     ['Dni trwania', `${summary.daysElapsed}`],
   ];
   if (summary.totalCapitalizedInterest > 0) {
     summaryBody.splice(3, 0,
-      ['Odsetki skapitalizowane', `${summary.totalCapitalizedInterest.toFixed(2)} PLN`],
+      ['Odsetki skapitalizowane', fmt(summary.totalCapitalizedInterest)],
     );
   }
 
@@ -73,11 +78,11 @@ export function downloadPDF(
       body: txEvents.map((e) => [
         e.date,
         e.transactionType ? TRANSACTION_TYPE_LABELS[e.transactionType] : '',
-        e.transactionAmount?.toFixed(2) ?? '',
-        e.dailyInterest.toFixed(2),
-        e.principalAfter.toFixed(2),
-        e.accruedInterestAfter.toFixed(2),
-        e.totalOwed.toFixed(2),
+        e.transactionAmount != null ? fmt(e.transactionAmount) : '',
+        fmt(e.dailyInterest),
+        fmt(e.principalAfter),
+        fmt(e.accruedInterestAfter),
+        fmt(e.totalOwed),
       ]),
       theme: 'striped',
       styles: { fontSize: 8, ...fontStyles },

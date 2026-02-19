@@ -36,7 +36,7 @@ const emptyForm = {
 };
 
 export function TransactionForm({ open, onOpenChange, editTransaction }: TransactionFormProps) {
-  const { state, dispatch } = useLoanStore();
+  const { activeLoan, dispatch } = useLoanStore();
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
   }, [editTransaction, open]);
 
   const handleSubmit = () => {
-    const errors = validateTransaction(form, state.config);
+    const errors = validateTransaction(form, activeLoan.config);
     if (errors.length > 0) {
       toast.error(errors[0].message);
       return;
@@ -119,7 +119,7 @@ export function TransactionForm({ open, onOpenChange, editTransaction }: Transac
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tx-amount">Kwota (PLN)</Label>
+            <Label htmlFor="tx-amount">Kwota ({activeLoan.config.currency})</Label>
             <Input
               id="tx-amount"
               type="number"

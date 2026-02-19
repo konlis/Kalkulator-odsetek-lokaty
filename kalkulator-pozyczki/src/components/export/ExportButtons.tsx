@@ -8,11 +8,11 @@ import { toast } from 'sonner';
 
 export function ExportButtons() {
   const { events, summary } = useCalculation();
-  const { state } = useLoanStore();
+  const { activeLoan } = useLoanStore();
 
   const handlePDF = () => {
     try {
-      downloadPDF(events, summary, state.config);
+      downloadPDF(events, summary, activeLoan.config);
       toast.success('PDF wygenerowany');
     } catch {
       toast.error('Błąd generowania PDF');
@@ -21,7 +21,7 @@ export function ExportButtons() {
 
   const handleCSV = () => {
     try {
-      downloadCSV(events, summary);
+      downloadCSV(events, summary, activeLoan.config.currency);
       toast.success('CSV wygenerowany');
     } catch {
       toast.error('Błąd generowania CSV');

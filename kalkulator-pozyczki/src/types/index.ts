@@ -10,18 +10,28 @@ export interface Transaction {
   note?: string;
 }
 
+export type Currency = 'PLN' | 'USD';
+
 export interface LoanConfig {
   initialCapital: number;
   annualInterestRate: number; // e.g. 14 for 14%
   startDate: string; // 'YYYY-MM-DD'
   endDate?: string; // Defaults to today
   capitalization: CapitalizationType; // Interest compounding frequency
+  currency: Currency;
 }
 
-export interface LoanState {
-  version: number;
+export interface Loan {
+  id: string;
+  name: string;
   config: LoanConfig;
   transactions: Transaction[];
+}
+
+export interface AppState {
+  version: number;
+  loans: Loan[];
+  activeLoanId: string;
 }
 
 export interface DayEvent {

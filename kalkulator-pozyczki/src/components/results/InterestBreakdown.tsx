@@ -1,15 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useCalculation } from '@/hooks/use-calculation';
 import { useLoanStore } from '@/hooks/use-loan-store';
-import { formatPLN, formatPercent } from '@/lib/formatters';
+import { formatCurrency, formatPercent } from '@/lib/formatters';
 import { Calculator } from 'lucide-react';
 
 export function InterestBreakdown() {
   const { summary } = useCalculation();
-  const { state } = useLoanStore();
+  const { activeLoan } = useLoanStore();
+  const fmt = (amount: number) => formatCurrency(amount, activeLoan.config.currency);
 
-  const dailyRate = state.config.annualInterestRate / 365;
-  const dailyInterestOnCurrent = summary.currentPrincipal * (state.config.annualInterestRate / 100 / 365);
+  const dailyRate = activeLoan.config.annualInterestRate / 365;
+  const dailyInterestOnCurrent = summary.currentPrincipal * (activeLoan.config.annualInterestRate / 100 / 365);
   const totalInterestGenerated = summary.totalAccruedInterest + summary.totalWithdrawn + summary.totalCapitalizedInterest;
 
   return (
@@ -24,7 +25,7 @@ export function InterestBreakdown() {
         <dl className="space-y-3">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Oprocentowanie roczne</dt>
-            <dd className="font-medium">{formatPercent(state.config.annualInterestRate)}</dd>
+            <dd className="font-medium">{formatPercent(activeLoan.config.annualInterestRate)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Oprocentowanie dzienne</dt>
@@ -32,37 +33,37 @@ export function InterestBreakdown() {
           </div>
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Odsetki dzienne (aktualne)</dt>
-            <dd className="font-medium">{formatPLN(dailyInterestOnCurrent)}</dd>
+            <dd className="font-medium">{fmt(dailyInterestOnCurrent)}</dd>
           </div>
           <hr className="border-border" />
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Łączne naliczone odsetki</dt>
-            <dd className="font-medium">{formatPLN(totalInterestGenerated)}</dd>
+            <dd className="font-medium">{fmt(totalInterestGenerated)}</dd>
           </div>
           {summary.totalCapitalizedInterest > 0 && (
             <div className="flex justify-between">
               <dt className="text-muted-foreground">Skapitalizowane (dodane do kapitału)</dt>
               <dd className="font-medium text-blue-600 dark:text-blue-400">
-                {formatPLN(summary.totalCapitalizedInterest)}
+                {fmt(summary.totalCapitalizedInterest)}
               </dd>
             </div>
           )}
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Wypłacono</dt>
             <dd className="font-medium text-green-600 dark:text-green-400">
-              {formatPLN(summary.totalWithdrawn)}
+              {fmt(summary.totalWithdrawn)}
             </dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Odsetki do spłaty</dt>
             <dd className="font-medium text-amber-600 dark:text-amber-400">
-              {formatPLN(summary.totalAccruedInterest)}
+              {fmt(summary.totalAccruedInterest)}
             </dd>
           </div>
           <hr className="border-border" />
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Łącznie wpłacono</dt>
-            <dd className="font-medium">{formatPLN(summary.totalDeposited)}</dd>
+            <dd className="font-medium">{fmt(summary.totalDeposited)}</dd>
           </div>
         </dl>
       </CardContent>
